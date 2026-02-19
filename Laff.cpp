@@ -88,4 +88,30 @@ namespace laff {
         alpha = Maths::sqrt(alpha);
         return true;
     }
+
+    bool zeros(Matrix& A) {
+        int size = A.m * A.n;
+        /* Choosed to bypass 2D operatior, to iterate directly over 1D 
+        contigous memory array as it avoids arithmetic overhead of indexes calculated by iteration
+		and guarantees sequential memory access.
+        */
+        for (int i = 0; i < size; i++) {
+            A.data[i] = 0.0;
+        }
+        return true;
+    }
+
+    bool identity(Matrix& A) {
+        if (A.m != A.n) {
+            return false;
+        }
+
+        zeros(A);
+
+        /* Set the diagonal elements to 1.0 */
+        for (int i = 0; i < A.m; i++) {
+            A(i, i) = 1.0;
+        }
+        return true;
+    }
 }

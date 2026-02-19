@@ -58,6 +58,21 @@ namespace laff {
      * @return True if successful, false if x is not a vector.
      */
     bool norm2(const Matrix& x, double& alpha);
+
+    /**
+     * Fills the matrix A with zeros.
+     * @param A Matrix to be zeroed
+     * @return True if successful
+     */
+    bool zeros(Matrix& A);
+
+    /**
+     * Transforms matrix A into an identity matrix.
+     * Matrix must be square (m == n).
+     * @param A Matrix to be transformed
+     * @return True if successful, false if A is not square
+     */
+    bool identity(Matrix& A);
 }
 
 #endif // LAFF_HPP
