@@ -73,6 +73,38 @@ namespace laff {
      * @return True if successful, false if A is not square
      */
     bool identity(Matrix& A);
+
+    /**
+     * Fills the diagonal of matrix A with elements from vector x.
+     * A is set to zero elsewhere.
+     * @param x Vector containing diagonal elements
+     * @param A Matrix to be updated
+     * @return True if successful, false if dimensions are incompatible
+     */
+    bool diag(const Matrix& x, Matrix& A);
+
+    /**
+     * Transposes matrix A and stores the result in B.
+     * B must have dimensions A.n x A.m.
+     * @param A Source matrix
+     * @param B Destination matrix
+     * @return True if successful, false if dimensions are incompatible
+     */
+    bool transpose(const Matrix& A, Matrix& B);
+
+    /**
+     * Sets all elements above the main diagonal of A to zero.
+     * @param A Matrix to be processed in-place
+     * @return True if successful
+     */
+    bool lower_tri(Matrix& A);
+
+    /**
+     * Sets all elements below the main diagonal of A to zero.
+     * @param A Matrix to be processed in-place
+     * @return True if successful
+     */
+    bool upper_tri(Matrix& A);
 }
 
 #endif // LAFF_HPP

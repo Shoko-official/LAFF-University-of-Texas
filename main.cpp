@@ -75,6 +75,39 @@ int main() {
     Matrix small(2, 1), large(3, 1);
     bool error = laff::axpy(1.0, small, large);
     std::cout << (!error ? "[OK] " : "[FAIL] ") << "Size mismatch handling\n";
+    std::cout << "----------------------------\n";
+
+    // --- Matrix Special Tests ---
+    std::cout << "\n=== Matrix Special Tests ===\n";
+
+    Matrix A_zeros(2, 2, 5.0);
+    laff::zeros(A_zeros);
+    print_res("Matrix Zeros (2x2)", true, A_zeros);
+
+    Matrix A_ident(3, 3);
+    laff::identity(A_ident);
+    print_res("Matrix Identity (3x3)", true, A_ident);
+
+    Matrix v_diag(3, 1);
+    v_diag.data[0] = 1.0; v_diag.data[1] = 2.0; v_diag.data[2] = 3.0;
+    Matrix A_diag(3, 3);
+    laff::diag(v_diag, A_diag);
+    print_res("Matrix Diagonal (1,2,3)", true, A_diag);
+
+    Matrix A_src(2, 3);
+    A_src(0,0)=1.0; A_src(0,1)=2.0; A_src(0,2)=3.0;
+    A_src(1,0)=4.0; A_src(1,1)=5.0; A_src(1,2)=6.0;
+    Matrix B_trans(3, 2);
+    laff::transpose(A_src, B_trans);
+    print_res("Matrix Transpose (2x3 -> 3x2)", true, B_trans);
+
+    Matrix A_tril(3, 3, 1.0);
+    laff::tril(A_tril);
+    print_res("Tril (Lower Triangular)", true, A_tril);
+
+    Matrix A_triu(3, 3, 1.0);
+    laff::triu(A_triu);
+    print_res("Triu (Upper Triangular)", true, A_triu);
 
     std::cout << "Tests completed.\n\n";
     return 0;

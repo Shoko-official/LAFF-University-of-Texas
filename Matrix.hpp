@@ -8,13 +8,13 @@
  */
 
 struct Matrix {
-    int m;
-    int n;
-    int ldim;
+    int m;              // rows
+    int n;              // cols
+    int ldim;           // leading dimension
     double* data;
     bool owns_memory;
-	
-    Matrix(int rows, int cols, double val = 0.0);
+
+    Matrix(int rows = 0, int cols = 0, double val = 0.0);
     Matrix(double* ptr, int rows, int cols, int leading_dim);
     ~Matrix();
 
