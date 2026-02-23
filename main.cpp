@@ -102,12 +102,45 @@ int main() {
     print_res("Matrix Transpose (2x3 -> 3x2)", true, B_trans);
 
     Matrix A_tril(3, 3, 1.0);
-    laff::tril(A_tril);
+    laff::lower_tri(A_tril);
     print_res("Tril (Lower Triangular)", true, A_tril);
 
     Matrix A_triu(3, 3, 1.0);
-    laff::triu(A_triu);
+    laff::upper_tri(A_triu);
     print_res("Triu (Upper Triangular)", true, A_triu);
+
+    // --- New Operations (Symmetry, Scaling, Addition) ---
+    Matrix A_to_sym(3, 3);
+    A_to_sym(0,0)=1; A_to_sym(1,0)=2; A_to_sym(1,1)=3; A_to_sym(2,0)=4; A_to_sym(2,1)=5; A_to_sym(2,2)=6;
+    laff::symmetrize_from_lower(A_to_sym);
+    print_res("Symmetrize from Lower", true, A_to_sym);
+
+    Matrix A_to_scal(2, 2, 2.0);
+    laff::scal_matrix(1.5, A_to_scal);
+    print_res("Scale Matrix (1.5 * [[2,2],[2,2]])", true, A_to_scal);
+
+    Matrix A_add1(2, 2, 1.0);
+    Matrix A_add2(2, 2, 2.0);
+    laff::add_matrix(A_add2, A_add1);
+    print_res("Add Matrices (1+2)", true, A_add1);
+
+    // --- GEMV Tests (Chapter 3.4) ---
+    std::cout << "\n=== GEMV Tests ===\n";
+    Matrix A_gemv(3, 3);
+    A_gemv(0,0)=-1; A_gemv(0,1)= 0; A_gemv(0,2)= 2;
+    A_gemv(1,0)= 2; A_gemv(1,1)=-1; A_gemv(1,2)= 1;
+    A_gemv(2,0)= 3; A_gemv(2,1)= 1; A_gemv(2,2)=-1;
+
+    Matrix x_gemv(3, 1);
+    x_gemv(0,0)=-1; x_gemv(1,0)= 2; x_gemv(2,0)= 4;
+
+    Matrix y_dot(3, 1, 0.0);
+    laff::gemv_dot(A_gemv, x_gemv, y_dot);
+    print_res("GEMV Dot (Expected [9, 0, -5])", true, y_dot);
+
+    Matrix y_gemv_axpy(3, 1, 0.0);
+    laff::gemv_axpy(A_gemv, x_gemv, y_gemv_axpy);
+    print_res("GEMV AXPY (Expected [9, 0, -5])", true, y_gemv_axpy);
 
     std::cout << "Tests completed.\n\n";
     return 0;

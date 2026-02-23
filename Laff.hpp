@@ -105,6 +105,56 @@ namespace laff {
      * @return True if successful
      */
     bool upper_tri(Matrix& A);
+
+    /**
+     * Symmetrizes matrix A by copying the lower triangle to the upper triangle.
+     * @param A Matrix to be symmetrized (must be square)
+     * @return True if successful
+     */
+    bool symmetrize_from_lower(Matrix& A);
+
+    /**
+     * Symmetrizes matrix A by copying the upper triangle to the lower triangle.
+     * @param A Matrix to be symmetrized (must be square)
+     * @return True if successful
+     */
+    bool symmetrize_from_upper(Matrix& A);
+
+    /**
+     * Scales matrix A by scalar alpha.
+     * @param alpha Scaling factor
+     * @param A Matrix to be scaled in place
+     * @return True if successful
+     */
+    bool scal_matrix(double alpha, Matrix& A);
+
+    /**
+     * Adds matrix B to matrix A (A := A + B).
+     * @param B Source matrix
+     * @param A Destination matrix (updated in place)
+     * @return True if successful, false if dimensions are incompatible
+     */
+    bool add_matrix(const Matrix& B, Matrix& A);
+
+    /**
+     * General Matrix-Vector Multiplication: y := Ax + y.
+     * Implemented using dot products (row by row).
+     * @param A Matrix m x n
+     * @param x Vector n x 1
+     * @param y Vector m x 1 (updated in place)
+     * @return True if successful
+     */
+    bool gemv_dot(const Matrix& A, const Matrix& x, Matrix& y);
+
+    /**
+     * General Matrix-Vector Multiplication: y := Ax + y.
+     * Implemented using AXPY operations (column by column).
+     * @param A Matrix m x n
+     * @param x Vector n x 1
+     * @param y Vector m x 1 (updated in place)
+     * @return True if successful
+     */
+    bool gemv_axpy(const Matrix& A, const Matrix& x, Matrix& y);
 }
 
 #endif // LAFF_HPP
