@@ -152,9 +152,54 @@ namespace laff {
      * @param A Matrix m x n
      * @param x Vector n x 1
      * @param y Vector m x 1 (updated in place)
-     * @return True if successful
      */
     bool gemv_axpy(const Matrix& A, const Matrix& x, Matrix& y);
+
+    /**
+     * General Matrix-Vector Multiplication with Transpose: y := A^T x + y.
+     * Implemented using dot products.
+     * @param A Matrix m x n
+     * @param x Vector m x 1
+     * @param y Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool gemv_t_dot(const Matrix& A, const Matrix& x, Matrix& y);
+
+    /**
+     * General Matrix-Vector Multiplication with Transpose: y := A^T x + y.
+     * Implemented using AXPY operations.
+     * @param A Matrix m x n
+     * @param x Vector m x 1
+     * @param y Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool gemv_t_axpy(const Matrix& A, const Matrix& x, Matrix& y);
+
+    /**
+     * Triangular Matrix-Vector Multiplication: x := L x (Lower, Non-transpose).
+     * @param L Lower triangular matrix n x n
+     * @param x Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool trmv_ln(const Matrix& L, Matrix& x);
+
+    /**
+     * Triangular Matrix-Vector Multiplication: x := U x (Upper, Non-transpose).
+     * @param U Upper triangular matrix n x n
+     * @param x Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool trmv_un(const Matrix& U, Matrix& x);
+
+    /**
+     * Symmetric Matrix-Vector Multiplication: y := A x + y.
+     * Where A is symmetric and only the lower triangle is used.
+     * @param A Symmetric matrix n x n
+     * @param x Vector n x 1
+     * @param y Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool symv_l(const Matrix& A, const Matrix& x, Matrix& y);
 }
 
 #endif // LAFF_HPP
