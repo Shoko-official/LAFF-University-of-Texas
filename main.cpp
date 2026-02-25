@@ -197,6 +197,42 @@ int main() {
     laff::symv_l(A_sym, x_sym, y_sym);
     print_res("SYMV (Expected [7, 10, 15])", true, y_sym);
 
+    // --- Week 5: Rank-1 Update ---
+    std::cout << "\n=== Week 5: Rank-1 Update (GER) ===\n";
+    Matrix A_ger(2, 3, 1.0);
+    Matrix x_ger(2, 1); x_ger(0,0)=1; x_ger(1,0)=2;
+    Matrix y_ger(3, 1); y_ger(0,0)=3; y_ger(1,0)=2; y_ger(2,0)=1;
+    
+    laff::ger(1.0, x_ger, y_ger, A_ger);
+    print_res("GER (1.0 * x * y^T + 1.0)", true, A_ger);
+
+    std::cout << "\n=== Week 5: Symmetric Rank-1 (SYR) ===\n";
+    Matrix A_syr(2, 2, 0.0);
+    Matrix x_syr(2, 1); x_syr(0,0)=1; x_syr(1,0)=2;
+    laff::syr_l(1.0, x_syr, A_syr);
+    print_res("SYR Lower (x * x^T)", true, A_syr);
+
+    // --- Week 5: GEMM ---
+    std::cout << "\n=== Week 5: GEMM ===\n";
+    Matrix A_m(2, 2); A_m(0,0)=1; A_m(0,1)=2; A_m(1,0)=3; A_m(1,1)=4;
+    Matrix B_m(2, 2); B_m(0,0)=5; B_m(0,1)=6; B_m(1,0)=7; B_m(1,1)=8;
+    Matrix C_dot(2, 2, 0.0);
+    
+    laff::gemm_dot(1.0, A_m, B_m, 0.0, C_dot);
+    print_res("GEMM Dot (Expected [[19, 22], [43, 50]])", true, C_dot);
+
+    Matrix C_axpy(2, 2, 0.0);
+    laff::gemm_axpy(1.0, A_m, B_m, 0.0, C_axpy);
+    print_res("GEMM AXPY", true, C_axpy);
+
+    Matrix C_row(2, 2, 0.0);
+    laff::gemm_row(1.0, A_m, B_m, 0.0, C_row);
+    print_res("GEMM Row", true, C_row);
+
+    Matrix C_outer(2, 2, 0.0);
+    laff::gemm_outer(1.0, A_m, B_m, 0.0, C_outer);
+    print_res("GEMM Outer", true, C_outer);
+
     std::cout << "Tests completed.\n\n";
     return 0;
 }

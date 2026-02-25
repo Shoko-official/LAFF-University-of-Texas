@@ -200,6 +200,73 @@ namespace laff {
      * @return True if successful
      */
     bool symv_l(const Matrix& A, const Matrix& x, Matrix& y);
+
+    /**
+     * Rank-1 Update (Outer Product): A := alpha * x * y^T + A.
+     * Maths: A := alpha * x * y^T + A
+     * See Week 5, Unit 5.3.4 (Page 183/190)
+     * @param alpha Scalar factor
+     * @param x Vector m x 1
+     * @param y Vector n x 1
+     * @param A Matrix m x n (updated in place)
+     * @return True if successful
+     */
+    bool ger(double alpha, const Matrix& x, const Matrix& y, Matrix& A);
+
+    /**
+     * Symmetric Rank-1 Update: A := alpha * x * x^T + A.
+     * Updates only the lower triangle of A.
+     * See Week 5, Unit 5.3.4 (Page 183)
+     * @param alpha Scalar factor
+     * @param x Vector n x 1
+     * @param A Symmetric matrix n x n (updated in place)
+     * @return True if successful
+     */
+    bool syr_l(double alpha, const Matrix& x, Matrix& A);
+
+    /**
+     * General Matrix-Matrix Multiplication: C := alpha * A * B + beta * C.
+     * Default implementation (calls gemm_axpy).
+     * See Week 5, Chapter 5.3 (Page 183)
+     * @param alpha Scalar factor
+     * @param A Matrix m x k
+     * @param B Matrix k x n
+     * @param beta Scalar factor (Beta * C)
+     * @param C Matrix m x n (updated in place)
+     * @return True if successful
+     */
+    bool gemm(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
+
+    /**
+     * Matrix-Matrix Multiplication variant using dot products.
+     * Computes C(i,j) := alpha * row_i(A) * col_j(B) + beta * C(i,j)
+     * See Week 5, Unit 5.3.1 (Page 184) - "Lots of Loops"
+     */
+    bool gemm_dot(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
+
+    /**
+     * Matrix-Matrix Multiplication variant using AXPY (Matrix-Vector).
+     * Computes C via columns: col_j(C) := alpha * A * col_j(B) + beta * col_j(C)
+     * See Week 5, Unit 5.3.2 (Page 186/187) - "Matrix-Matrix Multiplication by Columns"
+     * Corresponds to GEMM_UNB_VAR1 in FLAME notation.
+     */
+    bool gemm_axpy(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
+
+    /**
+     * Matrix-Matrix Multiplication variant using Rows.
+     * Computes C via rows: row_i(C) := alpha * row_i(A) * B + beta * row_i(C)
+     * See Week 5, Unit 5.3.3 (Page 188/189) - "Matrix-Matrix Multiplication by Rows"
+     * Corresponds to GEMM_UNB_VAR2 in FLAME notation.
+     */
+    bool gemm_row(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
+
+    /**
+     * Matrix-Matrix Multiplication variant using Outer Products (Rank-1 updates).
+     * Computes C via sum of outer products: C := alpha * sum( col_k(A) * row_k(B) ) + beta * C
+     * See Week 5, Unit 5.3.4 (Page 190/191) - "Rank-1 Updates"
+     * Corresponds to GEMM_UNB_VAR3 in FLAME notation.
+     */
+    bool gemm_outer(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
 }
 
 #endif // LAFF_HPP
