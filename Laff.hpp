@@ -267,6 +267,47 @@ namespace laff {
      * Corresponds to GEMM_UNB_VAR3 in FLAME notation.
      */
     bool gemm_outer(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C);
+
+    /**
+     * Triangular Solve: x := L^-1 * x (Lower Triangular, Non-transpose).
+     * Solves Lx = b where L is lower triangular, stored in-place in A.
+     * Assumes L is unit lower triangular if used with LU.
+     * See Week 6, Unit 6.3.2 (Page 212)
+     * @param L Lower triangular matrix n x n
+     * @param x Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool trsv_ln(const Matrix& L, Matrix& x);
+
+    /**
+     * Triangular Solve: x := U^-1 * x (Upper Triangular, Non-transpose).
+     * Solves Ux = b where U is upper triangular, stored in-place in A.
+     * See Week 6, Unit 6.3.3 (Page 214)
+     * @param U Upper triangular matrix n x n
+     * @param x Vector n x 1 (updated in place)
+     * @return True if successful
+     */
+    bool trsv_un(const Matrix& U, Matrix& x);
+
+    /**
+     * LU Factorization (Unblocked): A := LU.
+     * Computes the LU factorization of a square matrix A in-place.
+     * L is unit lower triangular (diagonal of 1s not stored).
+     * See Week 6, Unit 6.3.1 (Page 209)
+     * @param A Matrix n x n (updated in place)
+     * @return True if successful
+     */
+    bool lu_unb(Matrix& A);
+
+    /**
+     * Solves Ax = b using LU Factorization.
+     * Computes LU factorization of A, then solves via forward and backward substitution.
+     * A and b are updated in-place (A contains LU, b contains x).
+     * @param A Matrix n x n
+     * @param b Vector n x 1
+     * @return True if successful
+     */
+    bool solve_lu(Matrix& A, Matrix& b);
 }
 
 #endif // LAFF_HPP

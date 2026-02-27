@@ -233,6 +233,37 @@ int main() {
     laff::gemm_outer(1.0, A_m, B_m, 0.0, C_outer);
     print_res("GEMM Outer", true, C_outer);
 
+    // --- Week 6: LU and Solvers ---
+    std::cout << "\n=== Week 6: LU and Solvers ===\n";
+    
+    // Test TRSV Forward
+    Matrix L_sol(3, 3, 0.0);
+    L_sol(0,0)=1; 
+    L_sol(1,0)=2; L_sol(1,1)=1;
+    L_sol(2,0)=-1; L_sol(2,1)=2; L_sol(2,2)=1;
+    Matrix b_l(3, 1); b_l(0,0)=1; b_l(1,0)=4; b_l(2,0)=9;
+    laff::trsv_ln(L_sol, b_l);
+    print_res("TRSV Forward (Expected [1, 2, 6])", true, b_l);
+
+    // Test TRSV Backward
+    Matrix U_sol(3, 3, 0.0);
+    U_sol(0,0)=2; U_sol(0,1)=4; U_sol(0,2)=-2;
+    U_sol(1,1)=-10; U_sol(1,2)=10;
+    U_sol(2,2)=-8;
+    Matrix b_u(3, 1); b_u(0,0)=-10; b_u(1,0)=40; b_u(2,0)=-16;
+    laff::trsv_un(U_sol, b_u);
+    print_res("TRSV Backward (Expected [1, -2, 2])", true, b_u);
+
+    // Test LU and Full Solver
+    Matrix A_solve(3, 3);
+    A_solve(0,0)=2; A_solve(0,1)=4; A_solve(0,2)=-2;
+    A_solve(1,0)=4; A_solve(1,1)=-2; A_solve(1,2)=6;
+    A_solve(2,0)=6; A_solve(2,1)=-4; A_solve(2,2)=2;
+    Matrix b_solve(3, 1); b_solve(0,0)=-10; b_solve(1,0)=20; b_solve(2,0)=18;
+    
+    laff::solve_lu(A_solve, b_solve);
+    print_res("Full Solve_LU (Expected [1, -2, 2])", true, b_solve);
+
     std::cout << "Tests completed.\n\n";
     return 0;
 }
