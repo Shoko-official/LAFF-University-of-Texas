@@ -459,4 +459,179 @@ namespace laff {
         if (!trsv_un(A, b)) return false;
         return true;
     }
+
+    bool iamax(const Matrix& x, int& index) {
+        if (x.m != 1 && x.n != 1) return false;
+        int n = x.m * x.n;
+        index = 0;
+        double max_val = -1.0;
+        for (int i = 0; i < n; i++) {
+            double val = (x.m == 1) ? x(0, i) : x(i, 0);
+            double abs_val = (val < 0) ? -val : val;
+            if (abs_val > max_val) {
+                max_val = abs_val;
+                index = i;
+            }
+        }
+        return true;
+    }
+
+    bool swap_rows(Matrix& A, int i, int j) {
+        if (i == j) return true;
+        if (i < 0 || i >= A.m || j < 0 || j >= A.m) return false;
+        for (int k = 0; k < A.n; k++) {
+            double tmp = A(i, k);
+            A(i, k) = A(j, k);
+            A(j, k) = tmp;
+        }
+        return true;
+    }
+
+    bool lu_piv(Matrix& A, Matrix& p) {
+        if (A.m != A.n || p.m * p.n != A.m) return false;
+        int n = A.m;
+        // Initialize permutation vector
+        for (int i = 0; i < n; i++) {
+            if (p.m == 1) p(0, i) = (double)i;
+            else p(i, 0) = (double)i;
+        }
+
+        for (int k = 0; k < n; k++) {
+            // Find pivot in column k, from row k to n-1
+            Matrix col_slice = A.slice(k, n, k, k + 1);
+            int pivot_idx_local;
+            iamax(col_slice, pivot_idx_local);
+            int pivot_idx = k + pivot_idx_local;
+
+            // Record pivot
+            if (p.m == 1) p(0, k) = (double)pivot_idx;
+            else p(k, 0) = (double)pivot_idx;
+
+            // Swap rows in A
+            swap_rows(A, k, pivot_idx);
+
+            double alpha_kk = A(k, k);
+            if (alpha_kk == 0.0) return false;
+
+            // Scale column
+            for (int i = k + 1; i < n; i++) {
+                A(i, k) /= alpha_kk;
+            }
+
+            // Rank-1 update
+            for (int j = k + 1; j < n; j++) {
+                for (int i = k + 1; i < n; i++) {
+                    A(i, j) -= A(i, k) * A(k, j);
+                }
+            }
+        }
+        return true;
+    }
+
+    bool apply_piv(const Matrix& p, Matrix& b) {
+        if (p.m * p.n != b.m * b.n) return false;
+        int n = b.m * b.n;
+        for (int k = 0; k < n; k++) {
+            int pivot_idx = (int)((p.m == 1) ? p(0, k) : p(k, 0));
+            // Swap elements in b
+            if (b.m == 1) {
+                double tmp = b(0, k);
+                b(0, k) = b(0, pivot_idx);
+                b(0, pivot_idx) = tmp;
+            } else {
+                double tmp = b(k, 0);
+                b(k, 0) = b(pivot_idx, 0);
+                b(pivot_idx, 0) = tmp;
+            }
+        }
+        return true;
+    }
+
+    bool solve_lu_piv(Matrix& A, const Matrix& p, Matrix& b) {
+        if (!apply_piv(p, b)) return false;
+        if (!trsv_ln(A, b)) return false;
+        if (!trsv_un(A, b)) return false;
+        return true;
+    }
+
+    bool inv(const Matrix& A, Matrix& Ainv) {
+        if (A.m != A.n || Ainv.m != Ainv.n || A.m != Ainv.m) return false;
+        
+        int n = A.m;
+        Matrix LU = A; // Copy A
+        Matrix p(n, 1);
+        if (!lu_piv(LU, p)) return false;
+
+        zeros(Ainv);
+        for (int j = 0; j < n; j++) {
+            // Solve A * x_j = e_j
+            Matrix ej(n, 1, 0.0);
+            ej(j, 0) = 1.0;
+            if (!solve_lu_piv(LU, p, ej)) return false;
+            
+            // Copy result to j-th column of Ainv
+            for (int i = 0; i < n; i++) {
+                Ainv(i, j) = ej(i, 0);
+            }
+        }
+        return true;
+    }
+
+    bool chol(Matrix& A) {
+        if (A.m != A.n) return false;
+        int n = A.m;
+        for (int k = 0; k < n; k++) {
+            double alpha_kk = A(k, k);
+            if (alpha_kk <= 0.0) return false; // Matrix not SPD
+            alpha_kk = Maths::sqrt(alpha_kk);
+            A(k, k) = alpha_kk;
+
+            // Scale column below diagonal
+            for (int i = k + 1; i < n; i++) {
+                A(i, k) /= alpha_kk;
+            }
+
+            // Symmetric rank-1 update of trailing matrix
+            if (k < n - 1) {
+                Matrix a21 = A.slice(k + 1, n, k, k + 1);
+                Matrix A22 = A.slice(k + 1, n, k + 1, n);
+                syr_l(-1.0, a21, A22);
+            }
+        }
+        // Zero out the upper triangle to be clean
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < j; i++) {
+                A(i, j) = 0.0;
+            }
+        }
+        return true;
+    }
+
+    bool solve_chol(const Matrix& L, Matrix& b) {
+        if (L.m != L.n || b.m * b.n != L.m) return false;
+        int n = L.m;
+
+        // Forward substitution: Lz = b
+        for (int i = 0; i < n; i++) {
+            double& b_i = (b.m == 1) ? b(0, i) : b(i, 0);
+            for (int j = 0; j < i; j++) {
+                double b_j = (b.m == 1) ? b(0, j) : b(j, 0);
+                b_i -= L(i, j) * b_j;
+            }
+            if (L(i, i) == 0.0) return false;
+            b_i /= L(i, i);
+        }
+
+        // Backward substitution: L^T x = z (z is now in b)
+        for (int i = n - 1; i >= 0; i--) {
+            double& b_i = (b.m == 1) ? b(0, i) : b(i, 0);
+            for (int j = i + 1; j < n; j++) {
+                double b_j = (b.m == 1) ? b(0, j) : b(j, 0);
+                b_i -= L(j, i) * b_j; // Using L(j, i) for L^T(i, j)
+            }
+            // L^T(i, i) is L(i, i)
+            b_i /= L(i, i);
+        }
+        return true;
+    }
 }

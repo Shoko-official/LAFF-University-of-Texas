@@ -264,6 +264,54 @@ int main() {
     laff::solve_lu(A_solve, b_solve);
     print_res("Full Solve_LU (Expected [1, -2, 2])", true, b_solve);
 
+    // --- Week 7: Partial Pivoting and Inversion ---
+    std::cout << "\n=== Week 7: Partial Pivoting and Inversion ===\n";
+
+    // Matrix requiring pivot (A(0,0)=0)
+    Matrix A_swap(2, 2);
+    A_swap(0,0)=0; A_swap(0,1)=1;
+    A_swap(1,0)=1; A_swap(1,1)=1;
+    Matrix b_swap(2, 1);
+    b_swap(0,0)=1; b_swap(1,0)=2; // System: 0x + 1y = 1, 1x + 1y = 2 -> Solution: x=1, y=1
+
+    Matrix p_idx(2, 1);
+    bool s_lup = laff::lu_piv(A_swap, p_idx);
+    std::cout << (s_lup ? "[OK] " : "[FAIL] ") << "LU_PIV on matrix with zero pivot\n";
+
+    laff::solve_lu_piv(A_swap, p_idx, b_swap);
+    print_res("Solve_LU_PIV (Expected [1, 1])", true, b_swap);
+
+    // Matrix Inversion
+    Matrix A_inv_src(3, 3);
+    A_inv_src(0,0)=2; A_inv_src(0,1)=1; A_inv_src(0,2)=0;
+    A_inv_src(1,0)=1; A_inv_src(1,1)=2; A_inv_src(1,2)=1;
+    A_inv_src(2,0)=0; A_inv_src(2,1)=1; A_inv_src(2,2)=2;
+    
+    Matrix A_inv_res(3, 3);
+    bool s_inv = laff::inv(A_inv_src, A_inv_res);
+    std::cout << (s_inv ? "[OK] " : "[FAIL] ") << "Matrix Inversion\n";
+    
+    // Check A * A_inv
+    Matrix I_check(3, 3, 0.0);
+    laff::gemm(1.0, A_inv_src, A_inv_res, 0.0, I_check);
+    print_res("Identity Check (A * A^-1)", true, I_check);
+
+    // --- Week 8: Cholesky Factorization ---
+    std::cout << "\n=== Week 8: Cholesky Factorization ===\n";
+    Matrix A_chol(2, 2);
+    A_chol(0,0)=4; A_chol(0,1)=2;
+    A_chol(1,0)=2; A_chol(1,1)=2;
+    Matrix b_chol(2, 1);
+    b_chol(0,0)=6; b_chol(1,0)=4;
+
+    Matrix A_chol_copy = A_chol;
+    bool s_chol = laff::chol(A_chol);
+    std::cout << (s_chol ? "[OK] " : "[FAIL] ") << "Cholesky Factorization\n";
+    print_res("L factor (Expected [[2,0], [1,1]])", s_chol, A_chol);
+
+    laff::solve_chol(A_chol, b_chol);
+    print_res("Solve_CHOL (Expected [1, 1])", s_chol, b_chol);
+
     std::cout << "Tests completed.\n\n";
     return 0;
 }
