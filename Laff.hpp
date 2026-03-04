@@ -383,6 +383,49 @@ namespace laff {
      * @return True if successful
      */
     bool solve_chol(const Matrix& L, Matrix& b);
+
+    /**
+     * @brief Computes the Reduced Row Echelon Form (RREF) of matrix A.
+     * Uses Gauss-Jordan elimination with partial pivoting.
+     * See Week 9/10 concepts.
+     * @param A Matrix m x n (updated in-place)
+     * @param tol Tolerance for zero detection (default 1e-10)
+     * @return True if successful
+     */
+    bool rref(Matrix& A, double tol = 1e-10);
+
+    /**
+     * @brief Computes the rank of matrix A.
+     * Rank is the number of non-zero rows in RREF.
+     * @param A Matrix m x n
+     * @param tol Tolerance for zero detection
+     * @return The rank of the matrix
+     */
+    int rank(const Matrix& A, double tol = 1e-10);
+
+    /**
+     * @brief Checks if the columns of matrix A are linearly independent.
+     * iff rank(A) == A.n
+     */
+    bool is_linearly_independent(const Matrix& A, double tol = 1e-10);
+
+    /**
+     * @brief Checks if the columns of A span the space R^m.
+     * iff rank(A) == A.m
+     */
+    bool is_spanning(const Matrix& A, double tol = 1e-10);
+
+    /**
+     * @brief Checks if the columns of A form a basis for R^m.
+     * iff A is square and rank(A) == A.n
+     */
+    bool is_basis(const Matrix& A, double tol = 1e-10);
+
+    /**
+     * @brief Prints the matrix A to standard output.
+     * @param A Matrix to print
+     */
+    void print_matrix(const Matrix& A);
 }
 
 #endif // LAFF_HPP

@@ -1,5 +1,7 @@
 #include "Laff.hpp"
 #include "Utility/Maths.hpp"
+#include <iostream>
+#include <iomanip>
 
 /*
 * Implemented by Shoko on 2026-03-06
@@ -633,5 +635,97 @@ namespace laff {
             b_i /= L(i, i);
         }
         return true;
+    }
+
+    bool rref(Matrix& A, double tol) {
+        int m = A.m;
+        int n = A.n;
+        int pivot_row = 0;
+
+        for (int j = 0; j < n && pivot_row < m; j++) {
+            // Find pivot in column j, starting from pivot_row
+            int max_row = pivot_row;
+            double max_val = (A(max_row, j) < 0) ? -A(max_row, j) : A(max_row, j);
+
+            for (int i = pivot_row + 1; i < m; i++) {
+                double val = (A(i, j) < 0) ? -A(i, j) : A(i, j);
+                if (val > max_val) {
+                    max_val = val;
+                    max_row = i;
+                }
+            }
+
+            if (max_val < tol) {
+                // All entries in current column from pivot_row down are effectively zero
+                for (int i = pivot_row; i < m; i++) A(i, j) = 0.0;
+                continue;
+            }
+
+            // Swap rows
+            swap_rows(A, pivot_row, max_row);
+
+            // Scale pivot row
+            double pivot_val = A(pivot_row, j);
+            for (int k = j; k < n; k++) {
+                A(pivot_row, k) /= pivot_val;
+            }
+            A(pivot_row, j) = 1.0; // Ensure it's exactly 1.0
+
+            // Eliminate entries in pivot column
+            for (int i = 0; i < m; i++) {
+                if (i != pivot_row) {
+                    double factor = A(i, j);
+                    for (int k = j; k < n; k++) {
+                        A(i, k) -= factor * A(pivot_row, k);
+                    }
+                    A(i, j) = 0.0; // Ensure it's exactly 0.0
+                }
+            }
+            pivot_row++;
+        }
+        return true;
+    }
+
+    int rank(const Matrix& A, double tol) {
+        Matrix tmp = A;
+        rref(tmp, tol);
+        int r = 0;
+        for (int i = 0; i < tmp.m; i++) {
+            bool row_is_zero = true;
+            for (int j = 0; j < tmp.n; j++) {
+                double val = (tmp(i, j) < 0) ? -tmp(i, j) : tmp(i, j);
+                if (val > tol) {
+                    row_is_zero = false;
+                    break;
+                }
+            }
+            if (!row_is_zero) r++;
+        }
+        return r;
+    }
+
+    bool is_linearly_independent(const Matrix& A, double tol) {
+        // iff rank(A) == A.n (number of columns)
+        return rank(A, tol) == A.n;
+    }
+
+    bool is_spanning(const Matrix& A, double tol) {
+        // iff rank(A) == A.m (dimension of target space R^m)
+        return rank(A, tol) == A.m;
+    }
+
+    bool is_basis(const Matrix& A, double tol) {
+        // iff A is square and rank(A) == A.n
+        return (A.m == A.n) && (rank(A, tol) == A.n);
+    }
+
+    void print_matrix(const Matrix& A) {
+        for (int i = 0; i < A.m; i++) {
+            std::cout << "[ ";
+            for (int j = 0; j < A.n; j++) {
+                std::cout << std::fixed << std::setprecision(2) << std::setw(8) << A(i, j) << " ";
+            }
+            std::cout << " ]\n";
+        }
     }
 }
