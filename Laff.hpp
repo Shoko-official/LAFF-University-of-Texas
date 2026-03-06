@@ -39,6 +39,25 @@ namespace laff {
      * @return True: axpy operation succeeded, false if dimensions are invalid or incompatible
      */
     bool axpy(double alpha, const Matrix& x, Matrix& y);
+
+    /**
+     * Computes the dot product of two vectors: alpha := x^T y.
+     * See page 40
+     * @param x Source vector
+     * @param y Destination vector
+     * @param alpha Resulting scalar
+     * @return True : dot operation succeeded, false if dimensions are invalid of incompatibl
+     */
+    bool dot(const Matrix& x, const Matrix& y, double& alpha);
+
+     /**
+     * Computes the Euclidean length (two-norm) of a vector: alpha := ||x||_2.
+     * See page 43
+     * @param x Source vector
+     * @param alpha Resulting scalar
+     * @return True if successful, false if x is not a vector.
+     */
+    bool norm2(const Matrix& x, double& alpha);
 }
 
 #endif // LAFF_HPP
