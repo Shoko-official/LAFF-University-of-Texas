@@ -13,6 +13,7 @@
 #include "utility/Printing.hpp"
 
 namespace laff {
+    // Core utility routines
     bool zeros(Matrix& A);
     bool identity(Matrix& A);
     bool diag(const Matrix& x, Matrix& A);

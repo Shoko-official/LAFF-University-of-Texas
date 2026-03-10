@@ -4,7 +4,7 @@
 /**
  * Basic header of matrices
  * Created the 2026/02/15 by Shoko_ofi
- * Editted the 2026/03/08 by Shoko_ofi
+ * Edited the 2026/03/22 by Shoko (Added col/row methods)
  */
 
 struct Matrix {
@@ -23,6 +23,10 @@ struct Matrix {
 
     double& operator()(int i, int j);
     const double& operator()(int i, int j) const;
+
+    // View methods for columns and rows
+    Matrix col(int j);
+    Matrix row(int i);
 
     Matrix slice(int row_start, int row_end, int col_start, int col_end);
 };
