@@ -1,5 +1,4 @@
-#include "Laff.hpp"
-#include "Matrix.hpp"
+#include "laff/Laff.hpp"
 #include <iomanip>
 #include <iostream>
 
