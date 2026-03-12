@@ -4,7 +4,7 @@
 /**
  * Basic header of matrices
  * Created the 2026/02/15 by Shoko_ofi
- * Edited the 2026/03/22 by Shoko (Added col/row methods)
+ * Edited the 2026/03/22 by Shoko_ofi (Added col/row methods)
  */
 
 struct Matrix {
