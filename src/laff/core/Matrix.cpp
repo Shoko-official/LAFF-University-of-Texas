@@ -1,4 +1,4 @@
-#include "Matrix.hpp"
+#include "laff/Matrix.hpp"
 
 /*
  * Basic implementation of matrices
@@ -61,3 +61,11 @@ const double& Matrix::operator()(int i, int j) const {
 Matrix Matrix::slice(int row_start, int row_end, int col_start, int col_end) {
     return Matrix(data + (row_start * ldim) + col_start, row_end - row_start, col_end - col_start, ldim);
 }
+
+Matrix Matrix::col(int j) {
+    return Matrix(data + j, m, 1, ldim);
+}
+
+Matrix Matrix::row(int i) {
+    return Matrix(data + i * ldim, 1, n, 1);
+}
