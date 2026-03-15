@@ -17,7 +17,9 @@ namespace laff {
 
         int size = x.m * x.n;
         for (int i = 0; i < size; i++) {
-            y.data[i] = x.data[i];
+            double val = (x.m == 1) ? x(0, i) : x(i, 0);
+            if (y.m == 1) y(0, i) = val;
+            else y(i, 0) = val;
         }
            return true;
     }
@@ -29,12 +31,9 @@ namespace laff {
         }
 
         int size = x.m * x.n;
-        /* Choosed to bypass 2D operatior, to iterate directly over 1D 
-        contigous memory array
-        It avoid arithmetic overhead of indexes calculated by iteration, and guarantees sequential memory access.
-        */
         for (int i = 0; i < size; i++) {
-            x.data[i] *= alpha;
+            if (x.m == 1) x(0, i) *= alpha;
+            else x(i, 0) *= alpha;
         }
 
         return true;
@@ -49,13 +48,10 @@ namespace laff {
         }
         int size = x.m * x.n;
 
-        /* Choosed to bypass 2D operatior, to iterate directly over 1D 
-        contigous memory array
-        It avoid arithmetic overhead of indexes calculated by iteration, and guarantees sequential memory access.
-        */
         for (int i = 0; i < size; i++) {
-            // y := alpha * x + y
-            y.data[i] = alpha * x.data[i] + y.data[i];
+            double x_val = (x.m == 1) ? x(0, i) : x(i, 0);
+            if (y.m == 1) y(0, i) = alpha * x_val + y(0, i);
+            else y(i, 0) = alpha * x_val + y(i, 0);
         }
         return true;
     }
@@ -71,7 +67,9 @@ namespace laff {
         alpha = 0.0;
         
         for (int i = 0; i < size; i++){
-            alpha += x.data[i] * y.data[i];
+            double x_val = (x.m == 1) ? x(0, i) : x(i, 0);
+            double y_val = (y.m == 1) ? y(0, i) : y(i, 0);
+            alpha += x_val * y_val;
         }
         return true;
     }
@@ -90,13 +88,10 @@ namespace laff {
     }
 
     bool zeros(Matrix& A) {
-        int size = A.m * A.n;
-        /* Choosed to bypass 2D operatior, to iterate directly over 1D 
-        contigous memory array as it avoids arithmetic overhead of indexes calculated by iteration
-		and guarantees sequential memory access.
-        */
-        for (int i = 0; i < size; i++) {
-            A.data[i] = 0.0;
+        for (int i = 0; i < A.m; i++) {
+            for (int j = 0; j < A.n; j++) {
+                A(i, j) = 0.0;
+            }
         }
         return true;
     }
@@ -126,7 +121,8 @@ namespace laff {
 
         zeros(A);
         for (int i = 0; i < min_dim; i++) {
-            A(i, i) = x.data[i];
+            double val = (x.m == 1) ? x(0, i) : x(i, 0);
+            A(i, i) = val;
         }
         return true;
     }
@@ -158,6 +154,73 @@ namespace laff {
             for (int i = j + 1; i < A.m; i++) {
                 A(i, j) = 0.0;
             }
+        }
+        return true;
+    }
+
+    bool symmetrize_from_lower(Matrix& A) {
+        if (A.m != A.n) return false;
+        for (int j = 0; j < A.n; j++) {
+            for (int i = 0; i < j; i++) {
+                A(i, j) = A(j, i);
+            }
+        }
+        return true;
+    }
+
+    bool symmetrize_from_upper(Matrix& A) {
+        if (A.m != A.n) return false;
+        for (int j = 0; j < A.n; j++) {
+            for (int i = j + 1; i < A.m; i++) {
+                A(i, j) = A(j, i);
+            }
+        }
+        return true;
+    }
+
+    bool scal_matrix(double alpha, Matrix& A) {
+        for (int i = 0; i < A.m; i++) {
+            for (int j = 0; j < A.n; j++) {
+                A(i, j) *= alpha;
+            }
+        }
+        return true;
+    }
+
+    bool add_matrix(const Matrix& B, Matrix& A) {
+        if (A.m != B.m || A.n != B.n) return false;
+        for (int i = 0; i < A.m; i++) {
+            for (int j = 0; j < A.n; j++) {
+                A(i, j) += B(i, j);
+            }
+        }
+        return true;
+    }
+
+    bool gemv_dot(const Matrix& A, const Matrix& x, Matrix& y) {
+        // Validation: A (m x n), x (n x 1 or 1 x n), y (m x 1 or 1 x m)
+        if (x.m * x.n != A.n || y.m * y.n != A.m) return false;
+
+        for (int i = 0; i < A.m; i++) {
+            Matrix row = const_cast<Matrix&>(A).slice(i, i + 1, 0, A.n);
+            double rho;
+            dot(row, x, rho);
+            
+            // Handle y as either row or column vector
+            if (y.m == 1) y(0, i) += rho;
+            else y(i, 0) += rho;
+        }
+        return true;
+    }
+
+    bool gemv_axpy(const Matrix& A, const Matrix& x, Matrix& y) {
+        // Validation: A (m x n), x (n x 1 or 1 x n), y (m x 1 or 1 x m)
+        if (x.m * x.n != A.n || y.m * y.n != A.m) return false;
+
+        for (int j = 0; j < A.n; j++) {
+            Matrix col = const_cast<Matrix&>(A).slice(0, A.m, j, j + 1);
+            double alpha = (x.m == 1) ? x(0, j) : x(j, 0);
+            axpy(alpha, col, y);
         }
         return true;
     }
