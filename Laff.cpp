@@ -114,4 +114,51 @@ namespace laff {
         }
         return true;
     }
+
+    bool diag(const Matrix& x, Matrix& A) {
+        if (x.m != 1 && x.n != 1) {
+            return false;
+        }
+        int min_dim = (A.m < A.n) ? A.m : A.n;
+        if (x.m * x.n < min_dim) {
+            return false;
+        }
+
+        zeros(A);
+        for (int i = 0; i < min_dim; i++) {
+            A(i, i) = x.data[i];
+        }
+        return true;
+    }
+
+    bool transpose(const Matrix& A, Matrix& B) {
+        if (A.m != B.n || A.n != B.m) {
+            return false;
+        }
+
+        for (int i = 0; i < A.m; i++) {
+            for (int j = 0; j < A.n; j++) {
+                B(j, i) = A(i, j);
+            }
+        }
+        return true;
+    }
+
+    bool lower_tri(Matrix& A) {
+        for (int i = 0; i < A.m; i++) {
+            for (int j = i + 1; j < A.n; j++) {
+                A(i, j) = 0.0;
+            }
+        }
+        return true;
+    }
+
+    bool upper_tri(Matrix& A) {
+        for (int j = 0; j < A.n; j++) {
+            for (int i = j + 1; i < A.m; i++) {
+                A(i, j) = 0.0;
+            }
+        }
+        return true;
+    }
 }
