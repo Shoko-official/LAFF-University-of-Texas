@@ -3,3 +3,8 @@
 build/
 dist/
 *.exe
+*.obj
+*.pdb
+*.ilk
+build_log.txt
+build.bat
