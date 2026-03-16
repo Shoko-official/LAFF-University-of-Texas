@@ -308,4 +308,97 @@ namespace laff {
         }
         return true;
     }
+
+    bool ger(double alpha, const Matrix& x, const Matrix& y, Matrix& A) {
+        if (x.m * x.n != A.m || y.m * y.n != A.n) return false;
+
+        for (int j = 0; j < A.n; j++) {
+            double y_val = (y.m == 1) ? y(0, j) : y(j, 0);
+            for (int i = 0; i < A.m; i++) {
+                double x_val = (x.m == 1) ? x(0, i) : x(i, 0);
+                A(i, j) += alpha * x_val * y_val;
+            }
+        }
+        return true;
+    }
+
+    bool syr_l(double alpha, const Matrix& x, Matrix& A) {
+        if (A.m != A.n || x.m * x.n != A.m) return false;
+
+        for (int j = 0; j < A.n; j++) {
+            double x_j = (x.m == 1) ? x(0, j) : x(j, 0);
+            for (int i = j; i < A.m; i++) {
+                double x_i = (x.m == 1) ? x(0, i) : x(i, 0);
+                A(i, j) += alpha * x_i * x_j;
+            }
+        }
+        return true;
+    }
+
+    bool gemm(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C) {
+        return gemm_axpy(alpha, A, B, beta, C);
+    }
+
+    bool gemm_dot(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C) {
+        if (A.m != C.m || B.n != C.n || A.n != B.m) return false;
+
+        for (int i = 0; i < C.m; i++) {
+            for (int j = 0; j < C.n; j++) {
+                Matrix row_A = const_cast<Matrix&>(A).slice(i, i + 1, 0, A.n);
+                Matrix col_B = const_cast<Matrix&>(B).slice(0, B.m, j, j + 1);
+                double rho;
+                dot(row_A, col_B, rho);
+                C(i, j) = alpha * rho + beta * C(i, j);
+            }
+        }
+        return true;
+    }
+
+    bool gemm_axpy(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C) {
+        if (A.m != C.m || B.n != C.n || A.n != B.m) return false;
+
+        scal_matrix(beta, C);
+
+        // Compute C := alpha * A * B + C
+        for (int j = 0; j < C.n; j++) {
+            for (int k = 0; k < A.n; k++) {
+                double b_val = B(k, j);
+                double scaled_alpha = alpha * b_val;
+                for (int i = 0; i < A.m; i++) {
+                    C(i, j) += scaled_alpha * A(i, k);
+                }
+            }
+        }
+        return true;
+    }
+
+    bool gemm_row(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C) {
+        if (A.m != C.m || B.n != C.n || A.n != B.m) return false;
+
+        scal_matrix(beta, C);
+
+        for (int i = 0; i < C.m; i++) {
+            for (int k = 0; k < A.n; k++) {
+                double a_val = A(i, k);
+                double scaled_alpha = alpha * a_val;
+                for (int j = 0; j < C.n; j++) {
+                    C(i, j) += scaled_alpha * B(k, j);
+                }
+            }
+        }
+        return true;
+    }
+
+    bool gemm_outer(double alpha, const Matrix& A, const Matrix& B, double beta, Matrix& C) {
+        if (A.m != C.m || B.n != C.n || A.n != B.m) return false;
+
+        scal_matrix(beta, C);
+
+        for (int k = 0; k < A.n; k++) {
+            Matrix col_A = const_cast<Matrix&>(A).slice(0, A.m, k, k + 1);
+            Matrix row_B = const_cast<Matrix&>(B).slice(k, k + 1, 0, B.n);
+            ger(alpha, col_A, row_B, C);
+        }
+        return true;
+    }
 }
