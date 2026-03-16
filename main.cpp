@@ -109,7 +109,6 @@ int main() {
     laff::upper_tri(A_triu);
     print_res("Triu (Upper Triangular)", true, A_triu);
 
-    // --- New Operations (Symmetry, Scaling, Addition) ---
     Matrix A_to_sym(3, 3);
     A_to_sym(0,0)=1; A_to_sym(1,0)=2; A_to_sym(1,1)=3; A_to_sym(2,0)=4; A_to_sym(2,1)=5; A_to_sym(2,2)=6;
     laff::symmetrize_from_lower(A_to_sym);
@@ -141,6 +140,62 @@ int main() {
     Matrix y_gemv_axpy(3, 1, 0.0);
     laff::gemv_axpy(A_gemv, x_gemv, y_gemv_axpy);
     print_res("GEMV AXPY (Expected [9, 0, -5])", true, y_gemv_axpy);
+
+    // --- Week 4: Transpose GEMV ---
+    std::cout << "\n=== Week 4: Transpose GEMV ===\n";
+    Matrix A_t(3, 2);
+    A_t(0,0)=1; A_t(0,1)=2;
+    A_t(1,0)=-2; A_t(1,1)=-1;
+    A_t(2,0)=0; A_t(2,1)=1;
+    
+    Matrix x_t(3, 1);
+    x_t(0,0)=-1; x_t(1,0)=2; x_t(2,0)=-3;
+    
+    Matrix y_t_dot(2, 1, 0.0);
+    laff::gemv_t_dot(A_t, x_t, y_t_dot);
+    print_res("GEMV_T Dot (Expected [-5, -7])", true, y_t_dot);
+
+    Matrix y_t_axpy(2, 1, 0.0);
+    laff::gemv_t_axpy(A_t, x_t, y_t_axpy);
+    print_res("GEMV_T AXPY (Expected [-5, -7])", true, y_t_axpy);
+
+    // --- Week 4: TRMV ---
+    std::cout << "\n=== Week 4: TRMV ===\n";
+    Matrix L(3, 3);
+    L(0,0)=1;
+    L(1,0)=2; L(1,1)=1;
+    L(2,0)=3; L(2,1)=2; L(2,2)=1;
+    
+    Matrix x_l(3, 1);
+    x_l(0,0)=1; x_l(1,0)=2; x_l(2,0)=3;
+
+    laff::trmv_ln(L, x_l);
+    print_res("TRMV Lower (Expected [1, 4, 10])", true, x_l);
+
+    Matrix U(3, 3);
+    U(0,0)=1; U(0,1)=2; U(0,2)=3;
+    U(1,1)=1; U(1,2)=2;
+    U(2,2)=1;
+    
+    Matrix x_u(3, 1);
+    x_u(0,0)=1; x_u(1,0)=2; x_u(2,0)=3;
+
+    laff::trmv_un(U, x_u);
+    print_res("TRMV Upper (Expected [14, 8, 3])", true, x_u);
+
+    // --- Week 4: SYMV ---
+    std::cout << "\n=== Week 4: SYMV ===\n";
+    Matrix A_sym(3, 3);
+    A_sym(0,0)=1; 
+    A_sym(1,0)=2; A_sym(1,1)=3;
+    A_sym(2,0)=4; A_sym(2,1)=5; A_sym(2,2)=6;
+    
+    Matrix x_sym(3, 1);
+    x_sym(0,0)=1; x_sym(1,0)=1; x_sym(2,0)=1;
+    Matrix y_sym(3, 1, 0.0);
+    
+    laff::symv_l(A_sym, x_sym, y_sym);
+    print_res("SYMV (Expected [7, 10, 15])", true, y_sym);
 
     std::cout << "Tests completed.\n\n";
     return 0;

@@ -224,4 +224,88 @@ namespace laff {
         }
         return true;
     }
+
+    bool gemv_t_dot(const Matrix& A, const Matrix& x, Matrix& y) {
+        // Validation: A (m x n), x (m x 1 or 1 x m), y (n x 1 or 1 x n)
+        if (x.m * x.n != A.m || y.m * y.n != A.n) return false;
+
+        for (int j = 0; j < A.n; j++) {
+            Matrix col = const_cast<Matrix&>(A).slice(0, A.m, j, j + 1);
+            double rho;
+            dot(col, x, rho);
+            
+            if (y.m == 1) y(0, j) += rho;
+            else y(j, 0) += rho;
+        }
+        return true;
+    }
+
+    bool gemv_t_axpy(const Matrix& A, const Matrix& x, Matrix& y) {
+        // Validation: A (m x n), x (m x 1 or 1 x m), y (n x 1 or 1 x n)
+        if (x.m * x.n != A.m || y.m * y.n != A.n) return false;
+
+        for (int i = 0; i < A.m; i++) {
+            Matrix row = const_cast<Matrix&>(A).slice(i, i + 1, 0, A.n);
+            double alpha = (x.m == 1) ? x(0, i) : x(i, 0);
+            axpy(alpha, row, y);
+        }
+        return true;
+    }
+
+    bool trmv_ln(const Matrix& L, Matrix& x) {
+        // Validation: L (n x n), x (n x 1 or 1 x n)
+        if (L.m != L.n || x.m * x.n != L.m) return false;
+
+        // Use a temporary to avoid overwriting elements before they are used
+        Matrix x_copy(x.m, x.n);
+        copy(x, x_copy);
+        zeros(x);
+
+        for (int i = 0; i < L.m; i++) {
+            for (int j = 0; j <= i; j++) {
+                double val = (x_copy.m == 1) ? x_copy(0, j) : x_copy(j, 0);
+                if (x.m == 1) x(0, i) += L(i, j) * val;
+                else x(i, 0) += L(i, j) * val;
+            }
+        }
+        return true;
+    }
+
+    bool trmv_un(const Matrix& U, Matrix& x) {
+        // Validation: U (n x n), x (n x 1 or 1 x n)
+        if (U.m != U.n || x.m * x.n != U.m) return false;
+
+        Matrix x_copy(x.m, x.n);
+        copy(x, x_copy);
+        zeros(x);
+
+        for (int i = 0; i < U.m; i++) {
+            for (int j = i; j < U.n; j++) {
+                double val = (x_copy.m == 1) ? x_copy(0, j) : x_copy(j, 0);
+                if (x.m == 1) x(0, i) += U(i, j) * val;
+                else x(i, 0) += U(i, j) * val;
+            }
+        }
+        return true;
+    }
+
+    bool symv_l(const Matrix& A, const Matrix& x, Matrix& y) {
+        // Validation: A (n x n), x (n x 1 or 1 x n), y (n x 1 or 1 x n)
+        if (A.m != A.n || x.m * x.n != A.m || y.m * y.n != A.m) return false;
+
+        for (int i = 0; i < A.m; i++) {
+            double sum = 0.0;
+            for (int j = 0; j < A.n; j++) {
+                double x_val = (x.m == 1) ? x(0, j) : x(j, 0);
+                if (j <= i) {
+                    sum += A(i, j) * x_val;
+                } else {
+                    sum += A(j, i) * x_val; // Symmetric part
+                }
+            }
+            if (y.m == 1) y(0, i) += sum;
+            else y(i, 0) += sum;
+        }
+        return true;
+    }
 }
