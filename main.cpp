@@ -312,6 +312,35 @@ int main() {
     laff::solve_chol(A_chol, b_chol);
     print_res("Solve_CHOL (Expected [1, 1])", s_chol, b_chol);
 
+    std::cout << "\n=== Week 9: Vector Spaces ===\n";
+    Matrix A_rref(3, 3);
+    A_rref(0,0)=1; A_rref(0,1)=2; A_rref(0,2)=3;
+    A_rref(1,0)=4; A_rref(1,1)=5; A_rref(1,2)=6;
+    A_rref(2,0)=7; A_rref(2,1)=8; A_rref(2,2)=9;
+    
+    std::cout << "Original Matrix (3x3, Rank 2):\n";
+    laff::print_matrix(A_rref);
+    
+    int r = laff::rank(A_rref);
+    std::cout << "Rank (Expected 2): " << r << (r == 2 ? " [OK]" : " [FAIL]") << "\n";
+    
+    laff::rref(A_rref);
+    std::cout << "RREF (Expected row 3 as zeros):\n";
+    laff::print_matrix(A_rref);
+    
+    Matrix B_indep(3, 2);
+    B_indep(0,0)=1; B_indep(0,1)=0;
+    B_indep(1,0)=0; B_indep(1,1)=1;
+    B_indep(2,0)=0; B_indep(2,1)=0;
+    bool is_indep = laff::is_linearly_independent(B_indep);
+    std::cout << "Is linearly independent (Expected 1): " << is_indep << (is_indep ? " [OK]" : " [FAIL]") << "\n";
+    
+    Matrix C_basis(2, 2);
+    C_basis(0,0)=1; C_basis(0,1)=0;
+    C_basis(1,0)=0; C_basis(1,1)=1;
+    bool is_bas = laff::is_basis(C_basis);
+    std::cout << "Is basis (Expected 1): " << is_bas << (is_bas ? " [OK]" : " [FAIL]") << "\n";
+
     std::cout << "Tests completed.\n\n";
     return 0;
 }
