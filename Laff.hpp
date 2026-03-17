@@ -308,6 +308,81 @@ namespace laff {
      * @return True if successful
      */
     bool solve_lu(Matrix& A, Matrix& b);
+
+    /**
+     * Finds the index of the element with the largest absolute value in a vector.
+     * See Week 7, Unit 7.2.4
+     * @param x Source vector
+     * @param index Resulting index (0-indexed)
+     * @return True if successful
+     */
+    bool iamax(const Matrix& x, int& index);
+
+    /**
+     * Swaps two rows of a matrix.
+     * @param A Matrix to be updated in-place
+     * @param i First row index
+     * @param j Second row index
+     * @return True if successful
+     */
+    bool swap_rows(Matrix& A, int i, int j);
+
+    /**
+     * LU Factorization with Partial Pivoting: PA := LU.
+     * Computes the LU factorization of a square matrix A with row swapping.
+     * p stores the pivot indices (permutation information).
+     * See Week 7, Unit 7.2.4 (Page 267)
+     * @param A Matrix n x n (updated in place with L and U)
+     * @param p Permutation vector n x 1
+     * @return True if successful
+     */
+    bool lu_piv(Matrix& A, Matrix& p);
+
+    /**
+     * Applies the permutation recorded in p to vector b.
+     * See Week 7, Unit 7.2.4 (Page 268)
+     * @param p Permutation vector n x 1
+     * @param b Vector n x 1 (updated in-place)
+     * @return True if successful
+     */
+    bool apply_piv(const Matrix& p, Matrix& b);
+
+    /**
+     * Solves Ax = b using LU Factorization with Partial Pivoting.
+     * Updates A (LU) and b (x) in-place.
+     * @param A Matrix n x n
+     * @param p Permutation vector n x 1
+     * @param b Vector n x 1
+     * @return True if successful
+     */
+    bool solve_lu_piv(Matrix& A, const Matrix& p, Matrix& b);
+
+    /**
+     * Computes the inverse of a square matrix A using LU with pivoting.
+     * @param A Source matrix n x n
+     * @param Ainv Resulting inverse matrix n x n
+     * @return True if successful (matrix is non-singular)
+     */
+    bool inv(const Matrix& A, Matrix& Ainv);
+
+    /**
+     * Cholesky Factorization: A := LL^T.
+     * Computes the Cholesky factorization of a symmetric positive definite matrix A.
+     * Overwrites the lower triangular part with L.
+     * See Week 8, Unit 8.4.2 (Page 320)
+     * @param A Matrix n x n (updated in place)
+     * @return True if successful
+     */
+    bool chol(Matrix& A);
+
+    /**
+     * Solves Ax = b for a symmetric positive definite matrix A using its Cholesky factor L.
+     * Assumes A has been factored using chol().
+     * @param L Factored matrix n x n (only lower triangle used)
+     * @param b Vector n x 1 (updated in place with x)
+     * @return True if successful
+     */
+    bool solve_chol(const Matrix& L, Matrix& b);
 }
 
 #endif // LAFF_HPP
