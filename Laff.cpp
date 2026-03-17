@@ -401,4 +401,62 @@ namespace laff {
         }
         return true;
     }
+
+    bool trsv_ln(const Matrix& L, Matrix& x) {
+        if (L.m != L.n || x.m * x.n != L.m) return false;
+
+        int n = L.m;
+        for (int i = 0; i < n; i++) {
+            double& x_i = (x.m == 1) ? x(0, i) : x(i, 0);
+            for (int j = 0; j < i; j++) {
+                double x_j = (x.m == 1) ? x(0, j) : x(j, 0);
+                x_i -= L(i, j) * x_j;
+            }
+        }
+        return true;
+    }
+
+    bool trsv_un(const Matrix& U, Matrix& x) {
+        if (U.m != U.n || x.m * x.n != U.m) return false;
+
+        int n = U.m;
+        for (int i = n - 1; i >= 0; i--) {
+            double& x_i = (x.m == 1) ? x(0, i) : x(i, 0);
+            for (int j = i + 1; j < n; j++) {
+                double x_j = (x.m == 1) ? x(0, j) : x(j, 0);
+                x_i -= U(i, j) * x_j;
+            }
+            if (U(i, i) == 0.0) return false;
+            x_i /= U(i, i);
+        }
+        return true;
+    }
+
+    bool lu_unb(Matrix& A) {
+        if (A.m != A.n) return false;
+
+        int n = A.m;
+        for (int k = 0; k < n; k++) {
+            double alpha_kk = A(k, k);
+            if (alpha_kk == 0.0) return false;
+
+            for (int i = k + 1; i < n; i++) {
+                A(i, k) /= alpha_kk;
+            }
+
+            for (int j = k + 1; j < n; j++) {
+                for (int i = k + 1; i < n; i++) {
+                    A(i, j) -= A(i, k) * A(k, j);
+                }
+            }
+        }
+        return true;
+    }
+
+    bool solve_lu(Matrix& A, Matrix& b) {
+        if (!lu_unb(A)) return false;
+        if (!trsv_ln(A, b)) return false;
+        if (!trsv_un(A, b)) return false;
+        return true;
+    }
 }
