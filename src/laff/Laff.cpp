@@ -1,8 +1,17 @@
 #include "laff/Laff.hpp"
 
 namespace laff {
+    bool fill(Matrix& A, double val) {
+        for (int i = 0; i < A.m * A.n; i++) A.data[i] = val;
+        return true;
+    }
+
     bool zeros(Matrix& A) {
-        for (int i = 0; i < A.m * A.n; i++) A.data[i] = 0.0;
+        return fill(A, 0.0);
+    }
+
+    bool scal_matrix(double alpha, Matrix& A) {
+        for (int i = 0; i < A.m * A.n; i++) A.data[i] *= alpha;
         return true;
     }
 

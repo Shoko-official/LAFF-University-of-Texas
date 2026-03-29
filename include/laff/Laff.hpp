@@ -14,8 +14,11 @@
 
 namespace laff {
     // Core utility routines
+    bool fill(Matrix& A, double val);
     bool zeros(Matrix& A);
     bool identity(Matrix& A);
+
+
     bool diag(const Matrix& x, Matrix& A);
     bool transpose(const Matrix& A, Matrix& B);
     bool lower_tri(Matrix& A);
