@@ -1,20 +1,21 @@
 #ifndef LAFF_HPP
 #define LAFF_HPP
 
-#include "Matrix.hpp"
-#include "Vector.hpp"
-#include "blas/VectorOperations.hpp"
-#include "blas/MatrixVectorOps.hpp"
-#include "blas/MatrixMatrixMult.hpp"
-#include "linear_systems/LU.hpp"
-#include "cholesky/Cholesky.hpp"
-#include "vector_spaces/VectorSpaces.hpp"
-#include "utility/Maths.hpp"
-#include "utility/Printing.hpp"
+#include "laff/Matrix.hpp"
+#include "laff/Vector.hpp"
+#include "laff/blas/VectorOperations.hpp"
+#include "laff/blas/MatrixVectorOps.hpp"
+#include "laff/blas/MatrixMatrixMult.hpp"
+#include "laff/linear_systems/LU.hpp"
+#include "laff/cholesky/Cholesky.hpp"
+#include "laff/vector_spaces/VectorSpaces.hpp"
+#include "laff/utility/Maths.hpp"
+#include "laff/utility/Printing.hpp"
 
 namespace laff {
     // Core utility routines
     bool fill(Matrix& A, double val);
+
     bool zeros(Matrix& A);
     bool identity(Matrix& A);
 
