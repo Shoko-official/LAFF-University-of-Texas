@@ -77,14 +77,10 @@ namespace laff {
         return true;
     }
 
-    bool scal_matrix(double alpha, Matrix& A) {
-        for (int i = 0; i < A.m * A.n; i++) A.data[i] *= alpha;
-        return true;
-    }
-
     bool add_matrix(const Matrix& B, Matrix& A) {
         if (A.m != B.m || A.n != B.n) return false;
         for (int i = 0; i < A.m * A.n; i++) A.data[i] += B.data[i];
         return true;
     }
 }
+
