@@ -4,7 +4,8 @@ namespace laff {
     bool ger(double alpha, const Matrix& x, const Matrix& y, Matrix& A) {
         if (x.m * x.n != A.m || y.m * y.n != A.n) return false;
         for (int j = 0; j < A.n; j++) {
-            axpy(alpha * y.data[j], x, const_cast<Matrix&>(A).col(j));
+            Matrix col = const_cast<Matrix&>(A).col(j);
+            axpy(alpha * y.data[j], x, col);
         }
         return true;
     }
